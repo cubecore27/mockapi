@@ -10,23 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # Usually your settings.py is in BASE_DIR / project_name
+ROOT_ENV = BASE_DIR / '.env'
 
+# ✅ Load the environment variables from the .env file
+load_dotenv(dotenv_path=ROOT_ENV)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&&l3s1oz_m1q866pr!rh4(n4%_1qy=#3n%#p2(*r$)$df+4l-x'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS',  'localhost,127.0.0.1').split(',')
 
 # Application definition
 
@@ -39,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'amscheckout',  # Your app for asset management system checkout
+    'bmsproject',
     "corsheaders",
 ]
 

@@ -4,6 +4,12 @@ FROM python:3.11-alpine
 # Set working directory inside the container
 WORKDIR /app
 
+ARG DJANGO_JWT_KEY
+ARG DJANGO_ALLOWED_HOSTS
+
+ENV DJANGO_JWT_KEY=${DJANGO_JWT_KEY}
+ENV DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+
 
 # Install necessary dependencies
 RUN apk add --no-cache \

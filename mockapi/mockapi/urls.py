@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('amscheckout.urls')),  # Include the AMS checkout URLs
+    path('', include('bmsproject.urls')),  # Include the BMS project URLs
 ]
+

@@ -2,6 +2,7 @@
 
 # Apply migrations
 python python manage.py collectstatic
+python manage.py seed_checkouts
 python manage.py migrate
 
 # Start Gunicorn server
