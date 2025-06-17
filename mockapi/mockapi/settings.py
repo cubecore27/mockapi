@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'bmscheckout',  # Your app for asset management system checkout
     'amscheckout',  # Your app for asset management system checkout
     "corsheaders",
 ]
