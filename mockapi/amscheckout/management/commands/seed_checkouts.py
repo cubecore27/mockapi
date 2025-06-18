@@ -30,6 +30,7 @@ class Command(BaseCommand):
             # 50% chance the asset is still checked out
             if random.choice([True, False]):
                 return_date = None
+                is_checkout = True
             else:
                 return_date = fake.date_between(start_date=checkout_date, end_date='today')
                 is_checkout = False
@@ -43,5 +44,6 @@ class Command(BaseCommand):
                 return_date=return_date,
                 is_checkout=is_checkout
             )
+
 
         self.stdout.write(self.style.SUCCESS('✅ Seeded 20 tech-related checkout records.'))

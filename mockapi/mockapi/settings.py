@@ -13,7 +13,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+import os
+from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent  # Usually your settings.py is in BASE_DIR / project_name
+ROOT_ENV = BASE_DIR / '.env'
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +31,7 @@ SECRET_KEY = 'django-insecure-&&l3s1oz_m1q866pr!rh4(n4%_1qy=#3n%#p2(*r$)$df+4l-x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS',  'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -137,7 +143,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = [BASE_DIR / 'static']  # For local dev, optional
-STATIC_ROOT = BASE_DIR / 'staticfiles'   # For production (e.g., collectstatic)
+# STATIC_ROOT = BASE_DIR / 'staticfiles'   # For production (e.g., collectstatic)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
