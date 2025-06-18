@@ -24,9 +24,6 @@ COPY . .
 
 # Set the environment variables
 ENV PYTHONUNBUFFERED=1
-
-RUN python manage.py seed_projects
-RUN python manage.py seed_checkouts
 # RUN python manage.py collectstatic --noinput
 
 # Expose the application port
