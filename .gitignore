@@ -2,4 +2,4 @@
 /admin
 /rest_frameork
 /__pycache__   
-/
+**/db.sqlite3
