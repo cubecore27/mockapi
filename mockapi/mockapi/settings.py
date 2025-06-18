@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import os
@@ -21,6 +24,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent  # Usually your settings.py is in BASE_DIR / project_name
 ROOT_ENV = BASE_DIR / '.env'
 
+# ✅ Load the environment variables from the .env file
+load_dotenv(dotenv_path=ROOT_ENV)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -46,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'bmscheckout',  # Your app for asset management system checkout
     'amscheckout',  # Your app for asset management system checkout
+    'bmsproject',
     "corsheaders",
 ]
 

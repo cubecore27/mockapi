@@ -22,3 +22,4 @@ urlpatterns = [
     path('', include('amscheckout.urls')),  # Include the AMS checkout URLs
     path('', include('bmscheckout.urls')),  # Include the BMS checkout URLs
 ]
+
