@@ -17,11 +17,11 @@ class CheckoutResolveView(APIView):
         except Checkout.DoesNotExist:
             return Response({"detail": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        is_checkout = request.data.get("is_checkout")
-        if is_checkout is None:
-            return Response({"detail": "Missing 'is_checkout'"}, status=status.HTTP_400_BAD_REQUEST)
+        is_resolved = request.data.get("is_resolved")
+        if is_resolved is None:
+            return Response({"detail": "Missing 'is_resolved'"}, status=status.HTTP_400_BAD_REQUEST)
 
-        checkout.is_checkout = is_checkout
+        checkout.is_checkout = is_resolved
         checkout.save()
         return Response(CheckoutSerializer(checkout).data, status=status.HTTP_200_OK)
 
