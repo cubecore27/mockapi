@@ -149,7 +149,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = [BASE_DIR / 'static']  # For local dev, optional
-# STATIC_ROOT = BASE_DIR / 'staticfiles'   # For production (e.g., collectstatic)
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # For production (e.g., collectstatic)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
