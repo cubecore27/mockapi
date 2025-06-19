@@ -28,7 +28,7 @@ class Command(BaseCommand):
             requestor_location = random.choice(locations)
 
             if random.random() < 0.8:
-                # Checkout (80%)
+                # Checkout (Asset Out)
                 asset_id, asset_name = random.choice(asset_choices)
                 checkout_date = fake.date_between(start_date='-30d', end_date='today')
                 return_date = fake.date_between(start_date=checkout_date, end_date='today') if random.random() < 0.3 else None
@@ -42,24 +42,31 @@ class Command(BaseCommand):
                     checkout_date=checkout_date,
                     checkin_date=None,
                     return_date=return_date,
-                    is_resolved=False,  # still unresolved when checked out
-                    checkout_ref_id="1"
+                    is_resolved=False,
+                    checkout_ref_id=None,  # null
+                    condition=None          # null
                 )
             else:
-                # Check-in (20%)
+                # Check-in (Asset In)
                 checkin_date = fake.date_between(start_date='-30d', end_date='today')
+                condition = random.randint(1, 10)
+                ref_checkout = Checkout.objects.filter(checkin_date=None).order_by('?').first()
+
+                if not ref_checkout:
+                    continue  # skip if no open checkout to refer to
 
                 Checkout.objects.create(
                     ticket_id=ticket_id,
-                    asset_id=None,
-                    asset_name="",
+                    asset_id=ref_checkout.asset_id,
+                    asset_name=ref_checkout.asset_name,
                     requestor=requestor,
                     requestor_location=requestor_location,
-                    checkout_date=None,
+                    checkout_date=ref_checkout.checkout_date,
                     checkin_date=checkin_date,
-                    return_date=None,
-                    is_resolved=True,  # resolved upon check-in
-                    checkout_ref_id="1"
+                    return_date=checkin_date,
+                    is_resolved=False,  # still open until manually closed
+                    checkout_ref_id=ref_checkout.id,
+                    condition=condition
                 )
 
-        self.stdout.write(self.style.SUCCESS(f'✅ Seeded {num_records} check-in/checkout records with correct field sets and is_resolved flag.'))
+        self.stdout.write(self.style.SUCCESS(f'✅ Seeded {num_records} check-in/checkout records with correct field sets and logic.'))

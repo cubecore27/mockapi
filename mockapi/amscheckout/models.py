@@ -15,10 +15,11 @@ class Checkout(models.Model):
 
     is_resolved = models.BooleanField(default=False)
 
-    checkout_ref_id = models.CharField(max_length=100, default="1")  # optional external link
+    checkout_ref_id = models.CharField(max_length=100, default="1", null=True, blank=True)  # optional external link
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    condition = models.IntegerField(default=1, null=True, blank=True)  # 0: good, 1: damaged, 2: lost
 
     class Meta:
         ordering = ['-checkout_date']
