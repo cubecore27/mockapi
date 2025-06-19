@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'amscheckout',  # Your app for asset management system checkout
     'bmsproject',
     "corsheaders",
+    'django_filters',
 ]
 
 REST_FRAMEWORK = {
