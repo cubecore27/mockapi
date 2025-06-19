@@ -6,8 +6,10 @@ from .serializers import CheckoutSerializer
 
 # GET /api/ams/checkout-tickets
 class CheckoutListView(generics.ListAPIView):
-    queryset = Checkout.objects.all()
     serializer_class = CheckoutSerializer
+
+    def get_queryset(self):
+        return Checkout.objects.filter(is_resolved=True)
 
 # POST /api/ams/checkout-resolve/{ticket_id}
 class CheckoutResolveView(APIView):
