@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Checkout
 from .serializers import CheckoutSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 # GET /api/ams/checkout-tickets
 class CheckoutListView(generics.ListAPIView):
+    queryset = Checkout.objects.all()
     serializer_class = CheckoutSerializer
-
-    def get_queryset(self):
-        return Checkout.objects.filter(is_resolved=True)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_resolved']
 
 # POST /api/ams/checkout-resolve/{ticket_id}
 class CheckoutResolveView(APIView):
