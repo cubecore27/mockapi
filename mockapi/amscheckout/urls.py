@@ -4,5 +4,5 @@ urlpatterns = [
     path('api/ams/checkout-tickets', CheckoutListView.as_view(), name='checkout-list'),
     path('api/ams/checkout-resolve/<str:ticket_id>', CheckoutResolveView.as_view(), name='checkout-resolve'),
     path('api/ams/checkout-create', CheckoutCreateView.as_view(), name='checkout-create'),
-    path('api/ams/reset', FlushAndSeedCheckoutView.as_view(), name='flush-seed-checkouts'),
+    path('api/ams/reset/', FlushAndSeedCheckoutView.as_view(), name='flush-seed-checkouts'),
 ]

@@ -8,6 +8,7 @@ class Checkout(models.Model):
 
     requestor = models.CharField(max_length=100)
     requestor_location = models.CharField(max_length=255)
+    requestor_id = models.IntegerField(null=True, blank=True)
 
     checkout_date = models.DateField(null=True, blank=True)
     checkin_date = models.DateField(null=True, blank=True)  # new: explicitly separates from return_date

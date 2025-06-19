@@ -47,7 +47,8 @@ API_URL = "https://assets-service-production.up.railway.app/assets/"
 
 class FlushAndSeedCheckoutView(APIView):
     """
-    Deletes all checkout records and seeds 20 fresh check-in/checkout records.
+    Deletes all checkout records and seeds 20 fresh check-in/checkout records,
+    including 4 fixed default entries.
     """
 
     def post(self, request):
@@ -66,12 +67,16 @@ class FlushAndSeedCheckoutView(APIView):
         if not asset_choices:
             return Response({"error": "No valid assets returned from asset service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        locations = ["Manila HQ", "Cebu Branch", "Makati Office", "Davao Hub", "QC Tech Center"]
+        locations = [
+            "Manila HQ", "Cebu Branch", "Makati Office",
+            "Davao Hub", "QC Tech Center", "Pasig Office", "Quezon City Office"
+        ]
         num_records = 20
         created = 0
 
         for _ in range(num_records):
             ticket_id = f"TK-{fake.unique.random_int(min=1000, max=9999)}"
+            requestor_id = random.randint(1, 20)
             requestor = fake.name()
             requestor_location = random.choice(locations)
 
@@ -79,12 +84,13 @@ class FlushAndSeedCheckoutView(APIView):
                 # Checkout
                 asset_id, asset_name = random.choice(asset_choices)
                 checkout_date = fake.date_between(start_date='-30d', end_date='today')
-                return_date = fake.date_between(start_date=checkout_date, end_date='today')
+                return_date = fake.date_between(start_date=checkout_date, end_date='+30d')
 
                 Checkout.objects.create(
                     ticket_id=ticket_id,
                     asset_id=asset_id,
                     asset_name=asset_name,
+                    requestor_id=requestor_id,
                     requestor=requestor,
                     requestor_location=requestor_location,
                     checkout_date=checkout_date,
@@ -108,6 +114,7 @@ class FlushAndSeedCheckoutView(APIView):
                     ticket_id=ticket_id,
                     asset_id=ref_checkout.asset_id,
                     asset_name=ref_checkout.asset_name,
+                    requestor_id=requestor_id,
                     requestor=requestor,
                     requestor_location=requestor_location,
                     checkout_date=ref_checkout.checkout_date,
@@ -119,6 +126,70 @@ class FlushAndSeedCheckoutView(APIView):
                 )
                 created += 1
 
+        # Seed fixed default records
+        default_records = [
+            {
+                "ticket_id": "TK-9537",
+                "asset_id": 22,
+                "asset_name": "iPad Pro",
+                "requestor_id": 1,
+                "requestor": "Kelly Barron",
+                "requestor_location": "Pasig Office",
+                "checkout_date": "2025-06-16",
+                "return_date": "2025-08-16",
+                "checkin_date": None,
+                "checkout_ref_id": None,
+                "condition": None,
+                "is_resolved": False,
+            },
+            {
+                "ticket_id": "TK-3590",
+                "asset_id": 24,
+                "asset_name": "LENOVO",
+                "requestor_id": 2,
+                "requestor": "Tammy Sawyer",
+                "requestor_location": "Quezon City Office",
+                "checkout_date": "2025-06-13",
+                "return_date": "2028-06-16",
+                "checkin_date": None,
+                "checkout_ref_id": None,
+                "condition": None,
+                "is_resolved": False,
+            },
+            {
+                "ticket_id": "TK-6188",
+                "asset_id": 25,
+                "asset_name": "Samsung",
+                "requestor_id": 3,
+                "requestor": "Denise Jimenez",
+                "requestor_location": "Manila Office",
+                "checkout_date": "2025-06-13",
+                "return_date": "2027-06-16",
+                "checkin_date": "2027-06-16",
+                "checkout_ref_id": 1,
+                "condition": 9,
+                "is_resolved": False,
+            },
+            {
+                "ticket_id": "TK-6018",
+                "asset_id": 27,
+                "asset_name": "Samsuung 12",
+                "requestor_id": 3,
+                "requestor": "Denise Jimenez",
+                "requestor_location": "Makati Office",
+                "checkout_date": "2025-06-10",
+                "return_date": "2025-06-16",
+                "checkin_date": "2025-06-18",
+                "checkout_ref_id": 1,
+                "condition": 6,
+                "is_resolved": False,
+            },
+        ]
+
+        for record in default_records:
+            Checkout.objects.create(**record)
+            created += 1
+
         return Response({
-            "message": f"Flushed {deleted_count} records and seeded {created} new records."
+            "message": f"✅ Flushed {deleted_count} records and seeded {created} new records (including 4 defaults)."
         }, status=status.HTTP_201_CREATED)
