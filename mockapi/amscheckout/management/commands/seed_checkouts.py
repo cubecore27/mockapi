@@ -7,7 +7,7 @@ from amscheckout.models import Checkout
 API_URL = "https://assets-service-production.up.railway.app/assets/"
 
 class Command(BaseCommand):
-    help = 'Seed 20 fake checkout/checkin records with correct exclusive fields and is_resolved flag'
+    help = 'Seed 20 fake checkout/checkin records with proper field usage and return_date always set'
 
     def handle(self, *args, **kwargs):
         fake = Faker()
@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 # Checkout (Asset Out)
                 asset_id, asset_name = random.choice(asset_choices)
                 checkout_date = fake.date_between(start_date='-30d', end_date='today')
-                return_date = fake.date_between(start_date=checkout_date, end_date='today') if random.random() < 0.3 else None
+                return_date = fake.date_between(start_date=checkout_date, end_date='today')
 
                 Checkout.objects.create(
                     ticket_id=ticket_id,
@@ -41,10 +41,10 @@ class Command(BaseCommand):
                     requestor_location=requestor_location,
                     checkout_date=checkout_date,
                     checkin_date=None,
-                    return_date=return_date,
+                    return_date=return_date,        # always set
                     is_resolved=False,
-                    checkout_ref_id=None,  # null
-                    condition=None          # null
+                    checkout_ref_id=None,           # null for checkout
+                    condition=None                  # null for checkout
                 )
             else:
                 # Check-in (Asset In)
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 ref_checkout = Checkout.objects.filter(checkin_date=None).order_by('?').first()
 
                 if not ref_checkout:
-                    continue  # skip if no open checkout to refer to
+                    continue  # no open checkouts to reference
 
                 Checkout.objects.create(
                     ticket_id=ticket_id,
@@ -63,10 +63,12 @@ class Command(BaseCommand):
                     requestor_location=requestor_location,
                     checkout_date=ref_checkout.checkout_date,
                     checkin_date=checkin_date,
-                    return_date=checkin_date,
-                    is_resolved=False,  # still open until manually closed
+                    return_date=checkin_date,       # always set to checkin date
+                    is_resolved=False,              # still unresolved unless manually flagged
                     checkout_ref_id=ref_checkout.id,
                     condition=condition
                 )
 
-        self.stdout.write(self.style.SUCCESS(f'✅ Seeded {num_records} check-in/checkout records with correct field sets and logic.'))
+        self.stdout.write(self.style.SUCCESS(
+            f'✅ Seeded {num_records} check-in/checkout records with return_date always set.'
+        ))

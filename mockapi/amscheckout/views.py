@@ -35,3 +35,90 @@ class CheckoutCreateView(generics.CreateAPIView):
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+import random
+import requests
+from faker import Faker
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from amscheckout.models import Checkout
+
+API_URL = "https://assets-service-production.up.railway.app/assets/"
+
+class FlushAndSeedCheckoutView(APIView):
+    """
+    Deletes all checkout records and seeds 20 fresh check-in/checkout records.
+    """
+
+    def post(self, request):
+        fake = Faker()
+        deleted_count, _ = Checkout.objects.all().delete()
+
+        # Fetch asset data
+        try:
+            resp = requests.get(API_URL)
+            resp.raise_for_status()
+            assets = resp.json()
+        except Exception as e:
+            return Response({"error": f"Failed to fetch assets: {str(e)}"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        asset_choices = [(a["id"], a["name"]) for a in assets if a.get("name")]
+        if not asset_choices:
+            return Response({"error": "No valid assets returned from asset service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        locations = ["Manila HQ", "Cebu Branch", "Makati Office", "Davao Hub", "QC Tech Center"]
+        num_records = 20
+        created = 0
+
+        for _ in range(num_records):
+            ticket_id = f"TK-{fake.unique.random_int(min=1000, max=9999)}"
+            requestor = fake.name()
+            requestor_location = random.choice(locations)
+
+            if random.random() < 0.8:
+                # Checkout
+                asset_id, asset_name = random.choice(asset_choices)
+                checkout_date = fake.date_between(start_date='-30d', end_date='today')
+                return_date = fake.date_between(start_date=checkout_date, end_date='today')
+
+                Checkout.objects.create(
+                    ticket_id=ticket_id,
+                    asset_id=asset_id,
+                    asset_name=asset_name,
+                    requestor=requestor,
+                    requestor_location=requestor_location,
+                    checkout_date=checkout_date,
+                    checkin_date=None,
+                    return_date=return_date,
+                    is_resolved=False,
+                    checkout_ref_id=None,
+                    condition=None
+                )
+                created += 1
+            else:
+                # Check-in
+                checkin_date = fake.date_between(start_date='-30d', end_date='today')
+                condition = random.randint(1, 10)
+                ref_checkout = Checkout.objects.filter(checkin_date=None).order_by('?').first()
+
+                if not ref_checkout:
+                    continue
+
+                Checkout.objects.create(
+                    ticket_id=ticket_id,
+                    asset_id=ref_checkout.asset_id,
+                    asset_name=ref_checkout.asset_name,
+                    requestor=requestor,
+                    requestor_location=requestor_location,
+                    checkout_date=ref_checkout.checkout_date,
+                    checkin_date=checkin_date,
+                    return_date=checkin_date,
+                    is_resolved=False,
+                    checkout_ref_id=ref_checkout.id,
+                    condition=condition
+                )
+                created += 1
+
+        return Response({
+            "message": f"Flushed {deleted_count} records and seeded {created} new records."
+        }, status=status.HTTP_201_CREATED)
