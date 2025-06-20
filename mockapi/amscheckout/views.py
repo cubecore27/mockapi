@@ -24,7 +24,7 @@ class CheckoutResolveView(APIView):
         if is_resolved is None:
             return Response({"detail": "Missing 'is_resolved'"}, status=status.HTTP_400_BAD_REQUEST)
 
-        checkout.is_checkout = is_resolved
+        checkout.is_resolved = is_resolved
         checkout.save()
         return Response(CheckoutSerializer(checkout).data, status=status.HTTP_200_OK)
 
