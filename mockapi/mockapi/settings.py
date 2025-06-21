@@ -76,9 +76,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:1000",  # Replace with your frontend URL
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:1000",  # Replace with your frontend URL
+# ]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
